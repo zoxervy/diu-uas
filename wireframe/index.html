@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Wireframe Booking Futsal</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap">
+<style>
+/* Layout: di HP satu kolom (navigasi, bingkai layar, catatan); di layar lebar bingkai di kiri, catatan di kanan */
+:root {
+  --bg: #eef2ef;
+  --screen: #ffffff;
+  --fg: #18211c;
+  --muted: #5a6860;
+  --line: #c5cfc8;
+  --fill: #e4eae6;
+  --accent: #2e7a4d;
+  --accent-fg: #ffffff;
+  --accent-soft: #dcede2;
+  --warn: #9c4d18;
+  --warn-soft: #f8e8dc;
+  --danger: #b3261e;
+  --danger-soft: #f7e1df;
+  --scrim: rgba(16, 24, 20, 0.45);
+  --f-display: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111614; --screen: #19201c; --fg: #e4ebe6; --muted: #98a69e; --line: #35413a; --fill: #252f2a;
+    --accent: #62c08a; --accent-fg: #0c1811; --accent-soft: #1e3227; --warn: #e5a170; --warn-soft: #39291d;
+    --danger: #f08a80; --danger-soft: #3a1f1d; --scrim: rgba(0, 0, 0, 0.6); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111614; --screen: #19201c; --fg: #e4ebe6; --muted: #98a69e; --line: #35413a; --fill: #252f2a;
+  --accent: #62c08a; --accent-fg: #0c1811; --accent-soft: #1e3227; --warn: #e5a170; --warn-soft: #39291d;
+  --danger: #f08a80; --danger-soft: #3a1f1d; --scrim: rgba(0, 0, 0, 0.6); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px;
+}
+button, input, select { font: inherit; }
+:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.wrap { max-width: 880px; margin: 0 auto; display: grid; gap: 20px; }
+.top { display: grid; gap: 4px; }
+.eyebrow { font: 500 12px/1.4 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.top h1 { font: 600 clamp(1.55rem, 4.5vw, 2.1rem)/1.15 var(--f-display); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+.meta { color: var(--muted); margin: 0; font-size: 14px; }
+
+.layout { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); }
+.stage { display: grid; gap: 12px; min-width: 0; }
+@media (min-width: 820px) {
+  .layout { grid-template-columns: 400px minmax(0, 1fr); align-items: start; }
+  .notes { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+}
+
+.stepnav { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 8px; align-items: center; max-width: 400px; width: 100%; margin-inline: auto; }
+.nav-btn { height: 44px; border: 1.5px solid var(--line); background: var(--screen); color: var(--fg); border-radius: 12px; display: grid; place-items: center; cursor: pointer; }
+.nav-btn:disabled { opacity: .4; cursor: default; }
+#pick { width: 100%; height: 44px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--screen); color: var(--fg); font-weight: 600; font-size: 14px; padding: 0 12px; }
+
+/* Bingkai layar HP */
+.device {
+  position: relative; width: 100%; max-width: 400px; min-height: 690px; margin-inline: auto;
+  background: var(--screen); border: 1.5px solid var(--line); border-radius: 28px; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.statusbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 22px 4px; font: 600 12px var(--f-mono); color: var(--muted); }
+.sb { display: flex; gap: 3px; align-items: flex-end; }
+.sb i { width: 3px; background: var(--muted); border-radius: 1px; }
+.sb i:nth-child(1) { height: 5px; } .sb i:nth-child(2) { height: 8px; } .sb i:nth-child(3) { height: 11px; }
+.sb b { width: 20px; height: 10px; border: 1.5px solid var(--muted); border-radius: 3px; margin-left: 5px; }
+.appbar { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; align-items: center; padding: 4px 10px 10px; border-bottom: 1px solid var(--line); }
+.appbar h2 { font: 600 16px/1.3 var(--f-display); text-align: center; margin: 0; }
+.icon-btn { width: 40px; height: 40px; border: none; background: none; color: var(--fg); border-radius: 10px; display: grid; place-items: center; cursor: pointer; }
+.icon-btn:hover { background: var(--fill); }
+.body { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.center { text-align: center; align-items: center; }
+.foot { margin-top: auto; padding: 12px 16px 18px; border-top: 1px solid var(--line); display: grid; gap: 8px; background: var(--screen); }
+.btn { appearance: none; border: 1.5px solid var(--accent); background: var(--accent); color: var(--accent-fg); font-weight: 600; font-size: 15px; padding: 13px 16px; border-radius: 12px; cursor: pointer; width: 100%; }
+.btn:disabled { background: var(--fill); border-color: var(--fill); color: var(--muted); cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.label { font: 500 11px/1.4 var(--f-mono); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 0; }
+.hint { font-size: 13px; color: var(--muted); margin: 0; }
+
+/* Placeholder gambar ala wireframe (kotak bersilang) */
+.ph {
+  position: relative; display: grid; place-items: center; width: 100%; max-width: 100%; aspect-ratio: 16 / 9; border-radius: 12px;
+  background:
+    linear-gradient(to top right, transparent calc(50% - .75px), var(--line) 50%, transparent calc(50% + .75px)),
+    linear-gradient(to top left, transparent calc(50% - .75px), var(--line) 50%, transparent calc(50% + .75px)),
+    var(--fill);
+}
+.ph em { font: 500 10px var(--f-mono); font-style: normal; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); background: var(--fill); padding: 2px 6px; border-radius: 4px; }
+
+/* Beranda */
+.hello { margin: 0; color: var(--muted); }
+.big { font: 600 24px/1.2 var(--f-display); margin: 0; }
+.hero-card { display: grid; gap: 6px; text-align: left; border: 1.5px solid var(--accent); background: var(--accent-soft); color: var(--fg); border-radius: 16px; padding: 14px; cursor: pointer; }
+.hero-card .ph { aspect-ratio: 21 / 9; }
+.hero-card strong { font: 600 19px/1.2 var(--f-display); }
+.hero-card span { font-size: 14px; color: var(--muted); }
+.group { display: grid; gap: 8px; }
+.empty { border: 1.5px dashed var(--line); border-radius: 12px; padding: 14px; color: var(--muted); font-size: 14px; margin: 0; }
+.mini { display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1.5px solid var(--line); border-radius: 12px; padding: 12px; }
+.mini b { display: block; }
+.mini span { font-size: 13px; color: var(--muted); }
+.pill { font: 600 12px var(--f-mono); background: var(--accent-soft); color: var(--accent) !important; padding: 4px 8px; border-radius: 999px; white-space: nowrap; }
+.inforow { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.inforow span:first-child { color: var(--muted); }
+.tabbar { margin-top: auto; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); padding: 10px 0 16px; text-align: center; font: 500 12px var(--f-mono); color: var(--muted); }
+.tabbar .on { color: var(--accent); font-weight: 600; }
+
+/* Pilih lapangan */
+.lap { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 12px; align-items: center; text-align: left; padding: 10px; border: 1.5px solid var(--line); border-radius: 14px; background: var(--screen); color: var(--fg); cursor: pointer; width: 100%; }
+.lap:hover { border-color: var(--accent); }
+.lap .ph { aspect-ratio: 1; border-radius: 10px; }
+.lap b { font: 600 16px/1.3 var(--f-display); display: block; }
+.lap span { display: block; font-size: 13px; color: var(--muted); }
+.lap .price { color: var(--fg); font-weight: 600; margin-top: 4px; }
+
+/* Pilih jadwal */
+.ctx { display: flex; justify-content: space-between; gap: 4px 10px; flex-wrap: wrap; align-items: baseline; }
+.ctx b { font: 600 16px var(--f-display); }
+.ctx span { font-size: 13px; color: var(--muted); }
+.month { font-weight: 600; font-size: 14px; margin: 0 0 -6px; text-transform: capitalize; }
+.chips { display: flex; gap: 8px; overflow-x: auto; margin-inline: -16px; padding: 0 16px 4px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: 0 0 auto; min-width: 60px; display: grid; gap: 1px; justify-items: center; padding: 8px 6px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--screen); color: var(--fg); cursor: pointer; }
+.chip span { font-size: 11px; color: var(--muted); }
+.chip b { font: 600 18px var(--f-display); font-variant-numeric: tabular-nums; }
+.chip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.chip.on span { color: var(--accent-fg); }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+.lg { width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid var(--line); display: inline-block; background: var(--screen); }
+.lg.sel { background: var(--accent); border-color: var(--accent); }
+.lg.taken, .slot.taken { background: repeating-linear-gradient(135deg, var(--fill) 0 5px, var(--screen) 5px 10px); }
+.slots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.slot { display: grid; gap: 1px; justify-items: center; padding: 9px 4px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--screen); color: var(--fg); cursor: pointer; }
+.slot b { font: 600 15px var(--f-mono); font-variant-numeric: tabular-nums; }
+.slot span { font-size: 11px; color: var(--muted); }
+.slot.sel { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.slot.sel span { color: var(--accent-fg); }
+.slot.taken { color: var(--muted); cursor: not-allowed; }
+.slot.taken b { text-decoration: line-through; font-weight: 500; }
+.slot.past { opacity: .45; cursor: not-allowed; }
+.sum { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 14px; }
+.sum b { font: 600 18px var(--f-display); font-variant-numeric: tabular-nums; }
+.sum.muted { color: var(--muted); }
+
+/* Ringkasan */
+.box { border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 8px; }
+.rows { display: grid; gap: 6px; margin: 0; }
+.rows div { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.rows dt { color: var(--muted); }
+.rows dd { margin: 0; text-align: right; font-weight: 500; font-variant-numeric: tabular-nums; }
+.rows .total { border-top: 1px dashed var(--line); padding-top: 8px; }
+.rows .total dt, .rows .total dd { color: var(--fg); font-weight: 600; }
+.rows .dp dt, .rows .dp dd { color: var(--accent); font-weight: 600; }
+.field { display: grid; gap: 6px; }
+.field label { font-size: 13px; font-weight: 600; }
+.field input { font-size: 15px; padding: 12px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--screen); color: var(--fg); width: 100%; }
+.field input[aria-invalid="true"] { border-color: var(--danger); }
+.err { color: var(--danger); font-size: 13px; margin: 0; }
+
+/* Metode & bayar */
+.lockbar { display: flex; justify-content: space-between; gap: 8px; align-items: center; background: var(--accent-soft); padding: 10px 16px; font-size: 13px; }
+.lockbar b { font: 600 14px var(--f-mono); font-variant-numeric: tabular-nums; }
+.lockbar.late { background: var(--warn-soft); }
+.lockbar.late b { color: var(--warn); }
+.opts { display: grid; gap: 8px; }
+.opt { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; align-items: start; text-align: left; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--screen); color: var(--fg); cursor: pointer; width: 100%; }
+.opt .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); margin-top: 2px; background: var(--screen); }
+.opt[aria-checked="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.opt[aria-checked="true"] .dot { border-color: var(--accent); background: var(--accent); box-shadow: inset 0 0 0 3px var(--screen); }
+.opt b { display: block; font-weight: 600; }
+.opt span { font-size: 13px; color: var(--muted); }
+.cd-big { font: 600 40px/1.1 var(--f-mono); margin: 0; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.cd-big.late { color: var(--warn); }
+.amount { font: 600 24px var(--f-display); margin: 0; font-variant-numeric: tabular-nums; }
+.qr { width: 180px; aspect-ratio: 1; }
+.va { display: flex; gap: 8px; align-items: center; justify-content: space-between; border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; width: 100%; text-align: left; }
+.va code { font: 600 17px var(--f-mono); letter-spacing: .02em; user-select: all; }
+.small-btn { border: 1.5px solid var(--line); background: var(--screen); color: var(--fg); border-radius: 8px; padding: 6px 10px; font-weight: 600; font-size: 13px; cursor: pointer; flex: none; }
+.steps { text-align: left; margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 14px; width: 100%; }
+.divider { height: 1px; background: var(--line); width: 100%; }
+
+/* Hasil */
+.res-icon { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); margin-top: 12px; }
+.res-icon.bad { background: var(--danger-soft); color: var(--danger); }
+.res-icon.warn { background: var(--warn-soft); color: var(--warn); }
+.res { font: 600 22px/1.25 var(--f-display); margin: 0; }
+.lead { margin: 0; color: var(--muted); max-width: 32ch; }
+.ticket { width: 100%; border: 1.5px dashed var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; text-align: left; }
+.ticket .label { text-align: center; }
+.kode { font: 600 30px var(--f-mono); letter-spacing: .06em; margin: -4px 0 0; text-align: center; }
+
+/* Lapisan dalam layar */
+.toast { position: absolute; left: 12px; right: 12px; bottom: 100px; background: var(--fg); color: var(--screen); padding: 10px 14px; border-radius: 10px; font-size: 14px; z-index: 5; }
+.overlay { position: absolute; inset: 0; background: var(--scrim); display: flex; align-items: flex-end; z-index: 6; }
+.sheet { background: var(--screen); width: 100%; padding: 20px 16px 18px; border-radius: 20px 20px 0 0; display: grid; gap: 10px; }
+.sheet h3 { font: 600 18px var(--f-display); margin: 0; }
+.sheet p { margin: 0 0 4px; color: var(--muted); font-size: 14px; }
+
+/* Catatan desain */
+.notes { background: var(--screen); border: 1.5px solid var(--line); border-radius: 16px; padding: 16px; display: grid; gap: 10px; min-width: 0; max-width: 400px; width: 100%; margin-inline: auto; }
+@media (min-width: 820px) { .notes { max-width: none; } }
+.notes h2 { font: 600 18px var(--f-display); margin: 0; }
+#notes-title { font: 500 12px/1.4 var(--f-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--accent); margin: 0; }
+.notes ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; }
+#sims { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
+.sim { border: 1.5px dashed var(--warn); color: var(--warn); background: var(--warn-soft); border-radius: 10px; padding: 10px 12px; font-weight: 600; font-size: 13px; text-align: left; cursor: pointer; }
+.foot-note { font-size: 12px; color: var(--muted); margin: 0; border-top: 1px solid var(--line); padding-top: 10px; }
+
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">Wireframe · Desain Interaktif dan Usability</p>
+    <h1>Booking Lapangan Futsal</h1>
+    <p class="meta">Proses pemesanan jadwal dan pembayaran uang muka (DP) · Ahmad Yusuf (25010110186)</p>
+  </header>
+
+  <div class="layout">
+    <div class="stage">
+      <nav class="stepnav" aria-label="Navigasi layar">
+        <button class="nav-btn" id="prev" data-act="step:-1" aria-label="Layar sebelumnya">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <label for="pick" class="sr-only">Pilih layar</label>
+        <select id="pick">
+          <optgroup label="Alur utama">
+            <option value="beranda">1. Beranda</option>
+            <option value="lapangan">2. Pilih Lapangan</option>
+            <option value="jadwal">3. Pilih Jadwal</option>
+            <option value="ringkasan">4. Ringkasan Pesanan</option>
+            <option value="metode">5. Pilih Metode Bayar</option>
+            <option value="bayar">6. Instruksi Pembayaran</option>
+            <option value="berhasil">7. Booking Berhasil</option>
+          </optgroup>
+          <optgroup label="Kondisi khusus">
+            <option value="gagal">Pembayaran Gagal</option>
+            <option value="kedaluwarsa">Waktu Bayar Habis</option>
+          </optgroup>
+        </select>
+        <button class="nav-btn" id="next" data-act="step:1" aria-label="Layar berikutnya">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </nav>
+      <div class="device" id="device" aria-live="polite"></div>
+    </div>
+
+    <aside class="notes" aria-labelledby="notes-h">
+      <h2 id="notes-h">Catatan desain</h2>
+      <p id="notes-title"></p>
+      <ul id="notes-list"></ul>
+      <div id="sims" hidden></div>
+      <p class="foot-note">Semua tombol di dalam layar bisa diketuk. Nama, harga, dan jadwal terisi hanya contoh.</p>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function () {
+  var ORDER = ['beranda', 'lapangan', 'jadwal', 'ringkasan', 'metode', 'bayar', 'berhasil'];
+  var ALT = ['gagal', 'kedaluwarsa'];
+  var ALL = ORDER.concat(ALT);
+  var NAMES = {
+    beranda: 'Beranda', lapangan: 'Pilih Lapangan', jadwal: 'Pilih Jadwal', ringkasan: 'Ringkasan Pesanan',
+    metode: 'Pilih Metode Bayar', bayar: 'Instruksi Pembayaran', berhasil: 'Booking Berhasil',
+    gagal: 'Pembayaran Gagal', kedaluwarsa: 'Waktu Bayar Habis'
+  };
+  var BACK = { lapangan: 'beranda', jadwal: 'lapangan', ringkasan: 'jadwal', metode: 'ringkasan', berhasil: 'beranda', gagal: 'metode', kedaluwarsa: 'jadwal' };
+  var LAPANGAN = [
+    { nama: 'Lapangan A', jenis: 'Rumput sintetis · Indoor' },
+    { nama: 'Lapangan B', jenis: 'Rumput sintetis · Outdoor' },
+    { nama: 'Lapangan C', jenis: 'Vinyl · Indoor' }
+  ];
+  var METODE = [
+    { id: 'qris', nama: 'QRIS', ket: 'Scan dari aplikasi bank atau e-wallet apa pun' },
+    { id: 'va', nama: 'Transfer Bank (Virtual Account)', ket: 'BCA, BNI, BRI, Mandiri' },
+    { id: 'ewallet', nama: 'E-wallet', ket: 'Bayar langsung dari aplikasi e-wallet' }
+  ];
+  var HOURS = []; for (var h0 = 8; h0 <= 22; h0++) HOURS.push(h0);
+  var DP_RATE = 0.5, LOCK_MIN = 15;
+
+  var NOTES = {
+    beranda: ['Tombol "Booking Lapangan" dibuat paling besar karena itu tugas utama pengguna.', 'Bagian "Booking aktif" yang kosong diberi pesan, bukan dibiarkan kosong, supaya pengguna tahu belum ada pesanan.'],
+    lapangan: ['Setiap kartu menampilkan jenis lantai dan harga mulai, informasi yang paling dicari sebelum memilih.', 'Seluruh kartu bisa diketuk, bukan hanya teksnya, sehingga target sentuh besar.'],
+    jadwal: ['Ketersediaan ditampilkan sebagai grid jam, jadi slot kosong terlihat sekilas tanpa perlu mencoba satu per satu.', 'Slot terisi diberi arsir, coretan, dan label "Terisi", tidak hanya warna, agar tetap terbaca oleh pengguna buta warna.', 'Total harga diperbarui langsung setiap kali slot dipilih.'],
+    ringkasan: ['Total, DP, dan sisa pelunasan ditampilkan sebelum bayar supaya tidak ada biaya mengejutkan.', 'Nomor HP diperiksa saat diketik; tombol lanjut baru aktif kalau data sudah benar.', 'Begitu tombol ditekan, jadwal dikunci 15 menit untuk pengguna ini.'],
+    metode: ['Sisa waktu kunci jadwal selalu terlihat di bagian atas dan berubah warna saat kurang dari 3 menit.', 'Nominal DP ditulis di tombol, jadi pengguna tahu persis berapa yang akan ditagih.'],
+    bayar: ['Instruksi berubah sesuai metode yang dipilih.', 'Nomor virtual account bisa disalin dengan satu ketukan.', 'Tombol kembali memunculkan konfirmasi agar pesanan tidak hilang tanpa sengaja.'],
+    berhasil: ['Kode booking ditampilkan besar agar mudah ditunjukkan ke petugas.', 'Sisa pelunasan dan waktu datang ditulis jelas sebagai langkah berikutnya.'],
+    gagal: ['Pesan menjelaskan penyebab dan jalan keluarnya: coba lagi atau ganti metode.', 'Sisa waktu kunci tetap terlihat, jadi pengguna tahu jadwalnya belum hilang.'],
+    kedaluwarsa: ['Pengguna diberi tahu jadwal mana yang dilepas dan bahwa belum ada uang yang ditagih.', 'Satu tombol langsung mengarahkan ke pemilihan jadwal ulang.']
+  };
+  var SIMS = {
+    ringkasan: [['simDirebut', 'Simulasi: jadwal keburu dipesan orang lain']],
+    metode: [['simHabis', 'Simulasi: waktu kunci habis']],
+    bayar: [['simGagal', 'Simulasi: pembayaran gagal'], ['simHabis', 'Simulasi: waktu bayar habis']]
+  };
+
+  var IC = {
+    back: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>',
+    check: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+    x: '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg>',
+    clock: '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
+  };
+
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  var DATES = [];
+  for (var i = 0; i < 7; i++) { var d = new Date(today); d.setDate(d.getDate() + i); DATES.push(d); }
+
+  var st = {
+    lap: 0, date: 1, sel: [], nama: 'Rizal Pratama', hp: '081234567890', metode: 'qris',
+    lockUntil: 0, kode: '', taken: {}, toast: '', toastT: 0, confirm: false, booking: null
+  };
+
+  var dev = document.getElementById('device');
+  var pick = document.getElementById('pick');
+  var prevB = document.getElementById('prev');
+  var nextB = document.getElementById('next');
+  var notesTitle = document.getElementById('notes-title');
+  var notesList = document.getElementById('notes-list');
+  var sims = document.getElementById('sims');
+  var cur = 'beranda';
+  var scrollOnRender = false;
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function rp(n) { return 'Rp' + n.toLocaleString('id-ID'); }
+  function price(h) { return h >= 18 ? 150000 : 100000; }
+  function hh(h) { return (h < 10 ? '0' : '') + h + '.00'; }
+  function fmtDay(d) { return d.toLocaleDateString('id-ID', { weekday: 'short' }); }
+  function fmtMed(d) { return d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' }); }
+  function rangeText(arr) { arr = arr || st.sel; return arr.length ? hh(arr[0]) + '–' + hh(arr[arr.length - 1] + 1) : '-'; }
+  function key(h) { return st.lap + '|' + st.date + '|' + h; }
+  function left() { return Math.max(0, st.lockUntil - Date.now()); }
+  function fmtCd(ms) { var s = Math.ceil(ms / 1000), m = Math.floor(s / 60); s = s % 60; return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
+  function totals() {
+    var total = 0; st.sel.forEach(function (h) { total += price(h); });
+    var dp = Math.round(total * DP_RATE);
+    return { total: total, dp: dp, sisa: total - dp };
+  }
+  function status(h) {
+    if (st.date === 0 && h <= new Date().getHours()) return 'past';
+    if (st.taken[key(h)] || (h * 7 + st.date * 3 + st.lap * 5) % 4 === 0) return 'taken';
+    return st.sel.indexOf(h) >= 0 ? 'sel' : 'free';
+  }
+  function ensureSel() {
+    if (st.sel.length) return;
+    st.date = 1;
+    var tries = [19, 18, 20, 16, 14, 10, 8];
+    for (var i = 0; i < tries.length; i++) {
+      var h = tries[i];
+      if (status(h) === 'free' && status(h + 1) === 'free') { st.sel = [h, h + 1]; return; }
+    }
+  }
+  function newKode() { return 'FTS-' + Math.floor(1000 + Math.random() * 9000); }
+  function hpOk() { return /^08\d{8,11}$/.test(st.hp.replace(/[\s-]/g, '')); }
+  function namaOk() { return st.nama.trim().length >= 2; }
+  function vaNum() { var dg = (st.hp.replace(/\D/g, '') + '000000000000').slice(0, 12); return ('8808' + dg).replace(/(\d{4})(?=\d)/g, '$1 '); }
+
+  function statusbar() { return '<div class="statusbar" aria-hidden="true"><span>09.41</span><span class="sb"><i></i><i></i><i></i><b></b></span></div>'; }
+  function appbar(t, noBack) {
+    return '<header class="appbar">' + (noBack ? '<span></span>' : '<button class="icon-btn" data-act="back" aria-label="Kembali">' + IC.back + '</button>') +
+      '<h2>' + t + '</h2><span></span></header>';
+  }
+  function lockbar() { return '<div class="lockbar"><span>Jadwal dikunci untukmu</span><span>sisa <b data-cd>' + fmtCd(left()) + '</b></span></div>'; }
+  function detailRows() {
+    return '<div><dt>Lapangan</dt><dd>' + LAPANGAN[st.lap].nama + '</dd></div>' +
+      '<div><dt>Tanggal</dt><dd>' + fmtMed(DATES[st.date]) + '</dd></div>' +
+      '<div><dt>Jam</dt><dd>' + rangeText() + ' (' + st.sel.length + ' jam)</dd></div>';
+  }
+
+  var SCREENS = {
+    beranda: function () {
+      var bk = st.booking;
+      var aktif = bk
+        ? '<div class="mini"><div><b>' + LAPANGAN[bk.lap].nama + '</b><span>' + fmtMed(DATES[bk.date]) + ' · ' + rangeText(bk.sel) + '</span></div><span class="pill">' + bk.kode + '</span></div>'
+        : '<p class="empty">Belum ada booking. Jadwal yang kamu pesan akan muncul di sini.</p>';
+      return statusbar() + appbar('Booking Lapangan', true) +
+        '<div class="body">' +
+        '<div><p class="hello">Halo, ' + esc(st.nama.split(' ')[0] || 'kamu') + '</p><h3 class="big">Mau main kapan?</h3></div>' +
+        '<button class="hero-card" data-act="go:lapangan"><span class="ph"><em>Ilustrasi lapangan</em></span><strong>Booking Lapangan</strong><span>Pilih jadwal, lalu bayar DP untuk mengunci jam main.</span></button>' +
+        '<section class="group"><h4 class="label">Booking aktif</h4>' + aktif + '</section>' +
+        '<section class="group"><h4 class="label">Info</h4>' +
+        '<div class="inforow"><span>Jam buka</span><span>Setiap hari, 08.00–23.00</span></div>' +
+        '<div class="inforow"><span>Harga malam</span><span>Mulai 18.00</span></div></section>' +
+        '</div>' +
+        '<nav class="tabbar" aria-label="Menu aplikasi (di luar ruang lingkup)"><span class="on">Beranda</span><span>Riwayat</span><span>Akun</span></nav>';
+    },
+    lapangan: function () {
+      var cards = LAPANGAN.map(function (L, i) {
+        return '<button class="lap" data-act="lap:' + i + '"><span class="ph"><em>Foto</em></span><span><b>' + L.nama + '</b><span>' + L.jenis + '</span><span class="price">Mulai Rp100.000/jam</span></span></button>';
+      }).join('');
+      return statusbar() + appbar('Pilih Lapangan') +
+        '<div class="body"><p class="hint">3 lapangan tersedia. Ketuk salah satu untuk melihat jadwalnya.</p>' + cards + '</div>';
+    },
+    jadwal: function () {
+      var L = LAPANGAN[st.lap];
+      var chips = DATES.map(function (d, i) {
+        return '<button class="chip' + (i === st.date ? ' on' : '') + '" data-act="date:' + i + '" aria-pressed="' + (i === st.date) + '"><span>' + (i === 0 ? 'Hari ini' : fmtDay(d)) + '</span><b>' + d.getDate() + '</b></button>';
+      }).join('');
+      var slots = HOURS.map(function (h) {
+        var s = status(h);
+        var lab = s === 'taken' ? 'Terisi' : s === 'past' ? 'Lewat' : (h >= 18 ? 'Rp150rb' : 'Rp100rb');
+        var dis = s === 'taken' || s === 'past';
+        return '<button class="slot ' + s + '" data-act="slot:' + h + '"' + (dis ? ' disabled' : '') + ' aria-pressed="' + (s === 'sel') + '" aria-label="' + hh(h) + ', ' + lab + '"><b>' + hh(h) + '</b><span>' + lab + '</span></button>';
+      }).join('');
+      var t = totals();
+      var sum = st.sel.length
+        ? '<div class="sum"><span>' + st.sel.length + ' jam · ' + rangeText() + '</span><b>' + rp(t.total) + '</b></div>'
+        : '<div class="sum muted"><span>Belum ada jam dipilih</span></div>';
+      return statusbar() + appbar('Pilih Jadwal') +
+        '<div class="body">' +
+        '<div class="ctx"><b>' + L.nama + '</b><span>' + L.jenis + '</span></div>' +
+        '<p class="month">' + DATES[st.date].toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) + '</p>' +
+        '<div class="chips" role="group" aria-label="Tanggal">' + chips + '</div>' +
+        '<div class="legend"><span><i class="lg"></i>Tersedia</span><span><i class="lg sel"></i>Dipilih</span><span><i class="lg taken"></i>Terisi</span></div>' +
+        '<div class="slots">' + slots + '</div>' +
+        '<p class="hint">Pilih beberapa jam berurutan untuk main lebih lama. Harga malam berlaku mulai 18.00.</p>' +
+        '</div>' +
+        '<div class="foot">' + sum + '<button class="btn" data-act="go:ringkasan"' + (st.sel.length ? '' : ' disabled') + '>Lanjut</button></div>';
+    },
+    ringkasan: function () {
+      var t = totals();
+      var siang = st.sel.filter(function (h) { return h < 18; }).length, malam = st.sel.length - siang;
+      var lines = (siang ? '<div><dt>' + siang + ' jam siang × Rp100.000</dt><dd>' + rp(siang * 100000) + '</dd></div>' : '') +
+        (malam ? '<div><dt>' + malam + ' jam malam × Rp150.000</dt><dd>' + rp(malam * 150000) + '</dd></div>' : '');
+      return statusbar() + appbar('Ringkasan Pesanan') +
+        '<div class="body">' +
+        '<section class="box"><h4 class="label">Detail jadwal</h4><dl class="rows">' + detailRows() + '</dl></section>' +
+        '<section class="box"><h4 class="label">Rincian harga</h4><dl class="rows">' + lines +
+        '<div class="total"><dt>Total</dt><dd>' + rp(t.total) + '</dd></div>' +
+        '<div class="dp"><dt>DP 50% (bayar sekarang)</dt><dd>' + rp(t.dp) + '</dd></div>' +
+        '<div><dt>Sisa (bayar di lokasi)</dt><dd>' + rp(t.sisa) + '</dd></div></dl></section>' +
+        '<section class="group"><h4 class="label">Data pemesan</h4>' +
+        '<div class="field"><label for="nama">Nama</label><input id="nama" autocomplete="name" value="' + esc(st.nama) + '"><p class="err" id="nama-err" hidden>Isi nama pemesan, minimal 2 huruf.</p></div>' +
+        '<div class="field"><label for="hp">Nomor HP (WhatsApp)</label><input id="hp" inputmode="numeric" autocomplete="tel" value="' + esc(st.hp) + '" aria-describedby="hp-hint"><p class="err" id="hp-err" hidden>Nomor HP harus diawali 08 dan berisi 10–13 angka.</p><p class="hint" id="hp-hint">Kode booking dikirim ke nomor ini.</p></div>' +
+        '</section></div>' +
+        '<div class="foot"><button class="btn" id="btn-lanjut" data-act="submit">Lanjut Bayar DP · ' + rp(t.dp) + '</button></div>';
+    },
+    metode: function () {
+      var t = totals();
+      var opts = METODE.map(function (m) {
+        return '<button class="opt" role="radio" aria-checked="' + (st.metode === m.id) + '" data-act="metode:' + m.id + '"><span class="dot"></span><span><b>' + m.nama + '</b><span>' + m.ket + '</span></span></button>';
+      }).join('');
+      return statusbar() + appbar('Pilih Metode Bayar') + lockbar() +
+        '<div class="body">' +
+        '<section class="group"><h4 class="label">Metode pembayaran</h4><div class="opts" role="radiogroup" aria-label="Metode pembayaran">' + opts + '</div></section>' +
+        '<section class="box"><dl class="rows">' + detailRows() + '<div class="dp total"><dt>DP yang dibayar</dt><dd>' + rp(t.dp) + '</dd></div></dl></section>' +
+        '</div>' +
+        '<div class="foot"><button class="btn" data-act="go:bayar">Bayar DP ' + rp(t.dp) + '</button></div>';
+    },
+    bayar: function () {
+      var t = totals(), inst, steps;
+      if (st.metode === 'va') {
+        inst = '<div class="va"><span><span class="label">Nomor virtual account</span><br><code id="va-num">' + vaNum() + '</code></span><button class="small-btn" data-act="copy">Salin</button></div>';
+        steps = ['Buka m-banking atau ATM, pilih Transfer ke Virtual Account.', 'Masukkan nomor di atas.', 'Pastikan penerima "Booking Lapangan" dan nominal ' + rp(t.dp) + ', lalu konfirmasi.'];
+      } else if (st.metode === 'ewallet') {
+        inst = '<button class="btn ghost" data-act="openEwallet">Buka Aplikasi E-wallet</button>';
+        steps = ['Ketuk tombol di atas untuk membuka aplikasi e-wallet.', 'Konfirmasi pembayaran dengan PIN.', 'Kembali ke halaman ini; status diperbarui otomatis.'];
+      } else {
+        inst = '<div class="ph qr"><em>Kode QRIS</em></div>';
+        steps = ['Buka aplikasi bank atau e-wallet.', 'Pilih menu Scan atau QRIS, lalu arahkan ke kode di atas.', 'Pastikan nominal ' + rp(t.dp) + ', lalu konfirmasi.'];
+      }
+      var m = METODE.filter(function (x) { return x.id === st.metode; })[0];
+      return statusbar() + appbar('Pembayaran DP') +
+        '<div class="body center">' +
+        '<div><p class="label">Selesaikan pembayaran dalam</p><p class="cd-big" data-cd>' + fmtCd(left()) + '</p></div>' +
+        '<div><p class="label">DP via ' + m.nama + '</p><p class="amount">' + rp(t.dp) + '</p></div>' +
+        inst + '<div class="divider"></div>' +
+        '<ol class="steps">' + steps.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ol>' +
+        '</div>' +
+        '<div class="foot"><button class="btn" data-act="paid">Cek Status Pembayaran</button><button class="btn ghost" data-act="go:metode">Ganti Metode</button></div>';
+    },
+    berhasil: function () {
+      var t = totals();
+      return statusbar() + appbar('Booking Berhasil', true) +
+        '<div class="body center">' +
+        '<div class="res-icon">' + IC.check + '</div>' +
+        '<h3 class="res">Booking berhasil</h3><p class="lead">DP sudah diterima. Jadwal mainmu sudah pasti.</p>' +
+        '<div class="ticket"><p class="label">Kode booking</p><p class="kode">' + st.kode + '</p>' +
+        '<dl class="rows">' + detailRows() +
+        '<div class="dp total"><dt>DP dibayar</dt><dd>' + rp(t.dp) + '</dd></div>' +
+        '<div><dt>Sisa di lokasi</dt><dd>' + rp(t.sisa) + '</dd></div></dl></div>' +
+        '<p class="hint">Datang 15 menit sebelum jam main dan tunjukkan kode ini ke petugas.</p>' +
+        '</div>' +
+        '<div class="foot"><button class="btn" data-act="save">Simpan Bukti Booking</button><button class="btn ghost" data-act="home">Kembali ke Beranda</button></div>';
+    },
+    gagal: function () {
+      var why = { qris: 'Pembayaran QRIS dibatalkan dari aplikasi bank.', va: 'Nominal transfer tidak sesuai tagihan.', ewallet: 'Saldo e-wallet tidak mencukupi.' }[st.metode];
+      return statusbar() + appbar('Pembayaran DP') + lockbar() +
+        '<div class="body center">' +
+        '<div class="res-icon bad">' + IC.x + '</div>' +
+        '<h3 class="res">Pembayaran gagal</h3>' +
+        '<p class="lead">' + why + ' Jadwalmu masih dikunci, jadi kamu bisa coba lagi atau ganti metode.</p>' +
+        '<section class="box" style="width:100%;text-align:left"><dl class="rows">' + detailRows() + '</dl></section>' +
+        '</div>' +
+        '<div class="foot"><button class="btn" data-act="go:bayar">Coba Lagi</button><button class="btn ghost" data-act="go:metode">Ganti Metode</button></div>';
+    },
+    kedaluwarsa: function () {
+      return statusbar() + appbar('Pembayaran DP') +
+        '<div class="body center">' +
+        '<div class="res-icon warn">' + IC.clock + '</div>' +
+        '<h3 class="res">Waktu pembayaran habis</h3>' +
+        '<p class="lead">Jadwal ' + LAPANGAN[st.lap].nama + ', ' + fmtMed(DATES[st.date]) + ' pukul ' + rangeText() + ' sudah dilepas. Belum ada uang yang ditagih.</p>' +
+        '</div>' +
+        '<div class="foot"><button class="btn" data-act="retry">Pilih Jadwal Lagi</button></div>';
+    }
+  };
+
+  function confirmHTML() {
+    return '<div class="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="cf-h">' +
+      '<h3 id="cf-h">Batalkan pembayaran?</h3><p>Jadwal yang dikunci akan dilepas dan kamu harus memesan ulang.</p>' +
+      '<button class="btn" data-act="stay">Lanjut Bayar</button><button class="btn ghost" data-act="cancelPay">Ya, Batalkan</button></div></div>';
+  }
+
+  function prep(s) {
+    if (['ringkasan', 'metode', 'bayar', 'berhasil', 'gagal', 'kedaluwarsa'].indexOf(s) >= 0) ensureSel();
+    if (['metode', 'bayar', 'gagal'].indexOf(s) >= 0 && left() <= 0) st.lockUntil = Date.now() + LOCK_MIN * 60000;
+    if (s === 'berhasil' && !st.kode) st.kode = newKode();
+    if (s !== 'bayar') st.confirm = false;
+  }
+
+  function validate() {
+    var b = document.getElementById('btn-lanjut'); if (!b) return;
+    var hv = hpOk(), nv = namaOk();
+    var he = document.getElementById('hp-err'), ne = document.getElementById('nama-err');
+    var hpBad = !hv && st.hp.trim() !== '';
+    he.hidden = !hpBad; ne.hidden = nv;
+    document.getElementById('hp').setAttribute('aria-invalid', hpBad);
+    document.getElementById('nama').setAttribute('aria-invalid', !nv);
+    b.disabled = !(hv && nv);
+  }
+
+  function render() {
+    var h = location.hash.slice(1);
+    cur = ALL.indexOf(h) >= 0 ? h : 'beranda';
+    prep(cur);
+    var chipsEl = dev.querySelector('.chips'), sl = chipsEl ? chipsEl.scrollLeft : 0;
+    dev.innerHTML = SCREENS[cur]() + (st.confirm && cur === 'bayar' ? confirmHTML() : '') +
+      (st.toast ? '<div class="toast" role="status">' + esc(st.toast) + '</div>' : '');
+    var c2 = dev.querySelector('.chips'); if (c2) c2.scrollLeft = sl;
+    pick.value = cur;
+    var idx = ALL.indexOf(cur);
+    prevB.disabled = idx === 0; nextB.disabled = idx === ALL.length - 1;
+    notesTitle.textContent = (ORDER.indexOf(cur) >= 0 ? 'Layar ' + (ORDER.indexOf(cur) + 1) + ' dari ' + ORDER.length + ' · ' : 'Kondisi khusus · ') + NAMES[cur];
+    notesList.innerHTML = NOTES[cur].map(function (n) { return '<li>' + n + '</li>'; }).join('');
+    var sm = SIMS[cur] || [];
+    sims.innerHTML = sm.length ? '<p class="label">Coba kondisi khusus</p>' + sm.map(function (s) { return '<button class="sim" data-act="' + s[0] + '">' + s[1] + '</button>'; }).join('') : '';
+    sims.hidden = !sm.length;
+    if (cur === 'ringkasan') validate();
+    tick();
+    if (scrollOnRender) {
+      scrollOnRender = false;
+      var r = dev.getBoundingClientRect();
+      if (r.top < 0) {
+        var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+        pick.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+      }
+    }
+  }
+
+  function go(s) {
+    scrollOnRender = true;
+    if (location.hash === '#' + s) render(); else location.hash = s;
+  }
+  function toast(msg) {
+    st.toast = msg; clearTimeout(st.toastT);
+    st.toastT = setTimeout(function () { st.toast = ''; var t = dev.querySelector('.toast'); if (t) t.remove(); }, 3500);
+  }
+  function pickSlot(h) {
+    var s = st.sel;
+    if (!s.length) { st.sel = [h]; return; }
+    var min = s[0], max = s[s.length - 1];
+    if (s.indexOf(h) >= 0) { if (h === min) s.shift(); else if (h === max) s.pop(); else st.sel = [h]; return; }
+    if (h === min - 1 || h === max + 1) { s.push(h); s.sort(function (a, b) { return a - b; }); return; }
+    st.sel = [h];
+  }
+  function expire() { st.lockUntil = 0; st.confirm = false; go('kedaluwarsa'); }
+  function copyVA() {
+    var done = function () { toast('Nomor virtual account disalin.'); render(); };
+    var fail = function () {
+      var el = document.getElementById('va-num'); if (!el) return;
+      var r = document.createRange(); r.selectNodeContents(el);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      toast('Nomor sudah ditandai, salin secara manual.');
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(vaNum().replace(/\s/g, '')).then(done, fail);
+      else fail();
+    } catch (e) { fail(); }
+  }
+
+  function act(a, v) {
+    switch (a) {
+      case 'go': go(v); break;
+      case 'step': var i = ALL.indexOf(cur) + Number(v); if (i >= 0 && i < ALL.length) go(ALL[i]); break;
+      case 'back': if (cur === 'bayar') { st.confirm = true; render(); } else go(BACK[cur] || 'beranda'); break;
+      case 'lap': st.lap = Number(v); st.sel = []; go('jadwal'); break;
+      case 'date': st.date = Number(v); st.sel = []; render(); break;
+      case 'slot': pickSlot(Number(v)); render(); break;
+      case 'submit': if (hpOk() && namaOk()) { st.lockUntil = Date.now() + LOCK_MIN * 60000; go('metode'); } break;
+      case 'metode': st.metode = v; render(); break;
+      case 'paid':
+        st.sel.forEach(function (h) { st.taken[key(h)] = true; });
+        st.kode = newKode();
+        st.booking = { lap: st.lap, date: st.date, sel: st.sel.slice(), kode: st.kode };
+        st.lockUntil = 0; go('berhasil'); break;
+      case 'stay': st.confirm = false; render(); break;
+      case 'cancelPay': st.confirm = false; st.lockUntil = 0; st.sel = []; toast('Pembayaran dibatalkan. Jadwal sudah dilepas.'); go('jadwal'); break;
+      case 'copy': copyVA(); break;
+      case 'openEwallet': toast('Di aplikasi asli, tombol ini membuka aplikasi e-wallet.'); render(); break;
+      case 'save': toast('Bukti booking disimpan ke galeri (simulasi).'); render(); break;
+      case 'home': st.sel = []; st.kode = ''; go('beranda'); break;
+      case 'retry': st.sel = []; go('jadwal'); break;
+      case 'simDirebut':
+        ensureSel();
+        var last = st.sel[st.sel.length - 1];
+        st.taken[key(last)] = true; st.sel = [];
+        toast('Jam ' + hh(last) + ' baru saja dipesan orang lain. Pilih jam lain.');
+        go('jadwal'); break;
+      case 'simGagal': go('gagal'); break;
+      case 'simHabis': expire(); break;
+    }
+  }
+
+  function tick() {
+    var l = left();
+    var els = dev.querySelectorAll('[data-cd]');
+    for (var i = 0; i < els.length; i++) {
+      els[i].textContent = fmtCd(l);
+      var late = l < 180000;
+      if (els[i].classList.contains('cd-big')) els[i].classList.toggle('late', late);
+      var bar = els[i].closest('.lockbar'); if (bar) bar.classList.toggle('late', late);
+    }
+  }
+  setInterval(function () {
+    tick();
+    if (st.lockUntil && left() <= 0 && ['metode', 'bayar', 'gagal'].indexOf(cur) >= 0) expire();
+  }, 1000);
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]');
+    if (!b || b.disabled) return;
+    var parts = b.getAttribute('data-act').split(':');
+    act(parts[0], parts[1]);
+  });
+  document.addEventListener('input', function (e) {
+    if (e.target.id === 'nama') { st.nama = e.target.value; validate(); }
+    if (e.target.id === 'hp') { st.hp = e.target.value; validate(); }
+  });
+  pick.addEventListener('change', function () { go(pick.value); });
+  window.addEventListener('hashchange', render);
+  render();
+})();
+</script>
+
+</body>
+</html>
