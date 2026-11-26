@@ -3,16 +3,180 @@
 **Topik:** Perancangan antarmuka proses pemesanan jadwal dan pembayaran uang muka (DP)
 pada komputerisasi aplikasi booking lapangan futsal.
 
-Analisis dibagi tiga sesuai materi: kebutuhan fungsional, non-fungsional, dan kontekstual.
-Ruang lingkup hanya dua proses: **pemesanan jadwal** dan **pembayaran DP**.
+Dokumen ini mengikuti tiga langkah praktis analisis kebutuhan:
+
+1. Studi / identifikasi awal
+2. Sintesa alur proses dalam sistem yang melibatkan piranti komputasi
+3. Pemetaan spesifik tiap proses dan prosedur (prioritas fitur, alur prosedur, komponen antarmuka)
+
+Hasilnya dirangkum sebagai kebutuhan fungsional, non-fungsional, dan kontekstual (bagian 4),
+sebelum masuk ke wireframe dan prototype.
+
+> **Catatan istilah.** Di dokumen ini, **sistem** berarti keseluruhan mekanisme kerja penyewaan
+> lapangan futsal (orang, aturan, jadwal, uang, dan alat). **Aplikasi booking** hanyalah satu
+> piranti komputasi di dalam sistem itu, bukan sistemnya.
 
 ---
 
-## 1. Kebutuhan Fungsional
+## 1. Studi / Identifikasi Awal
+
+### 1.1 Peruntukan komputerisasi
+
+Aplikasi booking dipakai **pelanggan** untuk memesan jadwal lapangan dan membayar DP **secara
+mandiri**, tanpa harus menunggu admin lapangan membalas chat.
+
+### 1.2 Sistem kerja penyewaan lapangan dan pihak yang terlibat
+
+| Pihak | Peran dalam sistem | Berinteraksi dengan aplikasi? |
+|---|---|---|
+| Pelanggan (pemesan) | Memilih jadwal, membayar DP, datang dan melunasi | **Ya**, pengguna utama yang dirancang |
+| Admin / kasir lapangan | Mengatur jadwal, menerima pelunasan, mengecek kode booking | Ya, tetapi lewat sisi admin (di luar ruang lingkup) |
+| Penyedia pembayaran (QRIS, bank, e-wallet) | Memproses pembayaran DP | Tidak langsung; aplikasi meneruskan pembayaran |
+| Teman satu tim | Ikut bermain, menerima info jadwal | Tidak; hanya menerima bukti booking yang dibagikan |
+
+### 1.3 Mekanisme kerja saat ini (tanpa aplikasi)
+
+1. Pelanggan mengirim chat WhatsApp ke admin menanyakan jadwal kosong.
+2. Admin mengecek buku atau catatan jadwal, lalu membalas.
+3. Jika jam yang diinginkan terisi, tanya-jawab diulang.
+4. Pelanggan mentransfer DP dan mengirim foto bukti transfer.
+5. Admin mengecek mutasi rekening secara manual, mencatat jadwal, lalu mengonfirmasi.
+6. Pada hari main, pelanggan datang dan melunasi sisa biaya.
+
+### 1.4 Masalah yang ditemukan
+
+- **Lambat:** pelanggan menunggu balasan admin, apalagi di jam sibuk.
+- **Tidak transparan:** pelanggan tidak bisa melihat sendiri jam mana yang kosong.
+- **Rawan bentrok:** dua orang bisa dijanjikan jam yang sama sebelum admin mencatat.
+- **Verifikasi manual:** bukti transfer dicek satu per satu dan bisa terlewat.
+
+### 1.5 Sumber data
+
+- Pengalaman pribadi dan observasi saat booking lapangan futsal.
+- Wawancara singkat dengan 3-5 orang yang rutin bermain futsal (direncanakan).
+- Pembanding: pola umum aplikasi pemesanan jadwal (lapangan olahraga, tiket, reservasi).
+
+---
+
+## 2. Sintesa Alur Proses dalam Sistem
+
+### 2.1 Perbandingan langkah sebelum dan sesudah komputerisasi
+
+| Langkah dalam sistem | Sebelum (manual) | Sesudah (dengan aplikasi) | Piranti komputasi |
+|---|---|---|---|
+| Mencari jam kosong | Tanya admin lewat chat | Lihat grid jadwal di aplikasi | **Aplikasi** |
+| Memesan jam | Admin mencatat di buku | Pelanggan memilih slot sendiri | **Aplikasi** |
+| Mencegah bentrok | Bergantung ketelitian admin | Slot dikunci otomatis 15 menit | **Aplikasi** |
+| Membayar DP | Transfer, kirim foto bukti | QRIS / VA / e-wallet dari aplikasi | **Aplikasi** + penyedia pembayaran |
+| Verifikasi pembayaran | Admin cek mutasi manual | Status diperbarui otomatis | **Aplikasi** + penyedia pembayaran |
+| Bukti pemesanan | Chat konfirmasi admin | Kode booking di aplikasi | **Aplikasi** |
+| Pelunasan dan check-in | Bayar di kasir | Tunjukkan kode, bayar di kasir | Di luar ruang lingkup |
+
+### 2.2 Alur proses dalam sistem
+
+```mermaid
+flowchart LR
+    subgraph P[Pelanggan]
+        A1[Buka aplikasi] --> A2[Pilih lapangan,<br/>tanggal, jam]
+        A2 --> A3[Isi nama dan no HP]
+        A3 --> A4[Bayar DP]
+        A4 --> A5[Terima kode booking]
+        A5 --> A6[Datang, tunjukkan kode,<br/>lunasi sisa]
+    end
+    subgraph S[Aplikasi booking]
+        S1[Tampilkan slot<br/>tersedia/terisi] --> S2[Kunci slot 15 menit]
+        S2 --> S3[Teruskan ke pembayaran]
+        S3 --> S4[Catat booking,<br/>buat kode]
+    end
+    subgraph B[Penyedia pembayaran]
+        B1[Proses DP]
+    end
+    subgraph K[Admin / kasir]
+        K1[Cek kode booking,<br/>terima pelunasan]
+    end
+    A2 -.-> S1
+    A3 -.-> S2
+    A4 -.-> S3
+    S3 -.-> B1
+    B1 -.-> S4
+    S4 -.-> A5
+    A6 -.-> K1
+```
+
+### 2.3 Batas ruang lingkup
+
+- **Dirancang (2 proses):** pemesanan jadwal dan pembayaran DP, dari sisi pelanggan.
+- **Tidak dirancang:** registrasi/login, pelunasan di lokasi, check-in oleh petugas,
+  pembatalan setelah lunas DP, dan seluruh sisi admin.
+
+---
+
+## 3. Pemetaan Spesifik Proses dan Prosedur
+
+### 3.1 Prioritas fitur (metode MoSCoW)
+
+| Prioritas | Fitur | Kode kebutuhan |
+|---|---|---|
+| **Must have** (wajib) | Lihat ketersediaan slot, pilih slot, hitung harga otomatis | F-03, F-04, F-05 |
+| | Ringkasan pesanan dan data pemesan | F-06, F-07 |
+| | Kunci slot sementara | F-08 |
+| | Pilih metode bayar dan instruksi pembayaran | F-10, F-11 |
+| | Bukti booking dengan kode | F-15 |
+| **Should have** (sebaiknya ada) | Hitung mundur batas bayar | F-13 |
+| | Penanganan bayar gagal dan waktu habis | F-17, F-18 |
+| | Pemberitahuan slot direbut orang lain | F-09 |
+| | Konfirmasi sebelum membatalkan pembayaran | F-19 |
+| **Could have** (bagus kalau ada) | Salin nomor VA satu ketukan | F-12 |
+| | Simpan / bagikan bukti booking | F-16 |
+| **Won't have** (tidak dibuat sekarang) | Login, pembatalan dan refund, pilih jadwal berulang mingguan, sisi admin | - |
+
+### 3.2 Alur prosedur tiap proses
+
+**Proses 1: Pemesanan jadwal**
+
+| No | Prosedur | Input | Aturan | Output |
+|---|---|---|---|---|
+| 1.1 | Pilih lapangan | Ketukan pada kartu lapangan | - | Lapangan terpilih |
+| 1.2 | Pilih tanggal | Ketukan pada tanggal | Hari ini sampai 6 hari ke depan | Jadwal tanggal itu tampil |
+| 1.3 | Pilih jam | Ketukan pada slot | Hanya slot tersedia; beberapa slot harus berurutan | Daftar jam + total harga |
+| 1.4 | Periksa ringkasan | - | Tarif 18.00 ke atas Rp150.000/jam, sebelumnya Rp100.000/jam; DP 50% | Total, DP, sisa |
+| 1.5 | Isi data pemesan | Nama, nomor HP | Nama minimal 2 huruf; HP diawali 08, 10-13 angka | Data valid |
+| 1.6 | Lanjut bayar | Ketukan tombol | Slot dikunci 15 menit; jika slot sudah diambil orang, kembali ke 1.3 | Pesanan menunggu pembayaran |
+
+**Proses 2: Pembayaran DP**
+
+| No | Prosedur | Input | Aturan | Output |
+|---|---|---|---|---|
+| 2.1 | Pilih metode | QRIS / VA / e-wallet | Satu metode | Metode terpilih |
+| 2.2 | Ikuti instruksi | Pembayaran di aplikasi bank/e-wallet | Nominal harus sama dengan DP | Pembayaran terkirim |
+| 2.3 | Cek status | Ketukan tombol / otomatis | Sebelum waktu kunci habis | Berhasil / gagal |
+| 2.4a | Jika berhasil | - | - | Kode booking dan bukti |
+| 2.4b | Jika gagal | Coba lagi / ganti metode | Slot tetap dikunci selama sisa waktu | Kembali ke 2.1 atau 2.2 |
+| 2.4c | Jika waktu habis | - | Slot dilepas, tidak ada tagihan | Kembali ke 1.3 |
+
+### 3.3 Komponen antarmuka yang dibutuhkan
+
+| Layar | Komponen |
+|---|---|
+| Beranda | Tombol utama "Booking Lapangan" (kartu besar), daftar booking aktif, keadaan kosong (empty state) |
+| Pilih Lapangan | Kartu lapangan (foto, nama, jenis lantai, harga mulai) |
+| Pilih Jadwal | Deretan chip tanggal (geser horizontal), legenda status, grid slot jam 3 kolom, ringkasan total di bawah, tombol "Lanjut" |
+| Ringkasan Pesanan | Daftar detail (label-nilai), rincian harga, kolom isian nama dan HP, pesan error di bawah kolom, tombol berisi nominal DP |
+| Pilih Metode Bayar | Bilah hitung mundur kunci, kartu pilihan metode (radio), ringkasan DP |
+| Instruksi Pembayaran | Hitung mundur besar, nominal, kode QR / nomor VA + tombol "Salin" / tombol buka e-wallet, langkah bernomor, dialog konfirmasi batal |
+| Booking Berhasil | Ikon sukses, kartu tiket dengan kode booking besar, tombol simpan bukti |
+| Gagal / Waktu Habis | Ikon status, pesan penyebab dan solusi, tombol tindakan |
+| Semua layar | Bilah atas dengan tombol kembali, notifikasi singkat (toast) |
+
+---
+
+## 4. Hasil Analisis: Jenis Kebutuhan
+
+### 4.1 Kebutuhan Fungsional
 
 Fitur dan tindakan utama yang ingin dilakukan pengguna.
 
-### A. Proses pemesanan jadwal
+#### A. Proses pemesanan jadwal
 
 | Kode | Kebutuhan | Layar |
 |---|---|---|
@@ -26,7 +190,7 @@ Fitur dan tindakan utama yang ingin dilakukan pengguna.
 | F-08 | Aplikasi mengunci slot yang dipilih selama 15 menit setelah pengguna lanjut ke pembayaran | Ringkasan Pesanan |
 | F-09 | Aplikasi memberi tahu jika slot keburu dipesan pengguna lain, lalu mengarahkan memilih ulang | Pilih Jadwal |
 
-### B. Proses pembayaran DP
+#### B. Proses pembayaran DP
 
 | Kode | Kebutuhan | Layar |
 |---|---|---|
@@ -43,7 +207,7 @@ Fitur dan tindakan utama yang ingin dilakukan pengguna.
 
 ---
 
-## 2. Kebutuhan Non-Fungsional
+### 4.2 Kebutuhan Non-Fungsional
 
 Kualitas interaksi dan pengalaman pengguna.
 
@@ -61,27 +225,27 @@ Kualitas interaksi dan pengalaman pengguna.
 
 ---
 
-## 3. Kebutuhan Kontekstual
+### 4.3 Kebutuhan Kontekstual
 
 Kondisi saat aplikasi dipakai.
 
-### Perangkat yang digunakan
+#### Perangkat yang digunakan
 - **Smartphone Android kelas menengah**, layar sekitar 6 inci, karena itu perangkat yang paling umum dipakai mahasiswa dan pekerja muda.
 - **Sering dipakai satu tangan**, misalnya sambil berjalan atau di atas motor saat berhenti.
   Akibatnya, tombol utama diletakkan di bagian bawah layar agar terjangkau ibu jari.
 
-### Waktu penggunaan
+#### Waktu penggunaan
 - **Sore sampai malam**, setelah jam kuliah atau kerja, saat pengguna mengatur jadwal main bersama teman.
 - **Jadwal malam (18.00 ke atas) paling diburu**, sehingga slot cepat habis dan rawan bentrok.
   Akibatnya, aplikasi perlu kunci slot 15 menit dan pemberitahuan kalau slot direbut orang lain.
 - **Sering mendadak** (hari H atau H-1).
   Akibatnya, pilihan "Hari ini" diletakkan paling depan, dan jam yang sudah lewat ditandai.
 
-### Lokasi dan koneksi
+#### Lokasi dan koneksi
 - Dipakai di kos, kampus, atau di jalan dengan **koneksi internet yang tidak selalu stabil**.
   Akibatnya, status pembayaran harus jelas, dan pesanan tidak langsung hilang saat pembayaran gagal (slot tetap dikunci selama sisa waktu).
 
-### Tingkat literasi digital pengguna
+#### Tingkat literasi digital pengguna
 - **Pengguna utama:** mahasiswa dan pekerja muda usia 18-35 tahun, terbiasa memakai e-wallet, QRIS, dan aplikasi pemesanan online.
 - **Kebiasaan sebelumnya:** booking lewat chat WhatsApp ke admin lapangan.
   Masalahnya: balasan lambat, jadwal ternyata sudah terisi, dan bukti transfer dikirim manual.
@@ -91,7 +255,7 @@ Kondisi saat aplikasi dipakai.
 
 ---
 
-## 4. Catatan
+## 5. Catatan
 
 - Harga, persentase DP (50%), dan lama kunci slot (15 menit) adalah **asumsi** untuk keperluan perancangan.
 - Kebutuhan kontekstual sebaiknya **divalidasi** dengan wawancara singkat ke 3-5 orang yang rutin bermain futsal.
